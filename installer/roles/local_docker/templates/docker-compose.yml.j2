@@ -12,11 +12,17 @@ services:
       {% endif %}
     ports:
       - "{{ host_port }}:8052"
+      {% if enable_https %}
+      - "{{ host_port_https }}:8443"
+      {% endif %}
     hostname: {{ awx_web_hostname }}
     user: root
     restart: unless-stopped
-    {% if (project_data_dir is defined) or (ca_trust_dir is defined) %}
+    {% if (project_data_dir is defined) or (ca_trust_dir is defined) or enable_https %}
     volumes:
+    {% endif %}
+    {% if enable_https %}
+      - {{ cert_dir + ':/certs:ro' }}
     {% endif %}
     {% if project_data_dir is defined %}
       - "{{ project_data_dir +':/var/lib/awx/projects:rw' }}"
